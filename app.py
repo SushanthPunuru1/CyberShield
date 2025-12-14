@@ -2,7 +2,7 @@ import streamlit as st
 import google.generativeai as genai
 
 # ---------------- CONFIG ----------------
-genai.configure(api_key = "API_KEY_VALUE")
+API_KEY_VALUE = st.secrets["API_KEY"]
 genai.configure(api_key = API_KEY_VALUE)
 model = genai.GenerativeModel("gemini-2.5-flash")
 
@@ -116,6 +116,7 @@ if st.button("Analyze Message"):
 
 # ---------------- FOOTER ----------------
 st.caption("⚠️ This tool provides guidance only. Always verify messages independently.")
+
 
 
 

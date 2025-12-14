@@ -1,129 +1,120 @@
 import streamlit as st
 import google.generativeai as genai
 
-API_KEY_VALUE = st.secrets["API_KEY"]
-genai.configure(api_key = API_KEY_VALUE)
-
-
+# ---------------- CONFIG ----------------
+genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 model = genai.GenerativeModel("gemini-2.5-flash")
 
-
-# --- App Title ---
+# ---------------- UI HEADER ----------------
 st.title("Social Engineering & Phishing Detector")
-st.write("Paste a message or URL to check for social engineering or phishing risks.")
+st.write("Analyze suspicious messages and URLs to detect phishing and manipulation.")
 
-# --- User Info ---
+# ---------------- USER INPUT ----------------
 name = st.text_input("Enter your name:")
 
-# --- Message Input ---
-content = st.text_area("Paste the content of the message/email you received:")
+content = st.text_area(
+    "Paste the content of the message/email you received:",
+    height=180
+)
 
-# --- Survey Section ---
-st.header("Survey")
+# ---------------- SURVEY ----------------
+st.header("Context Survey")
 
-howRecieved = st.text_input("How did you receive this message?")
+howRecieved = st.text_input("How did you receive this message? (e.g., email, SMS, Instagram)")
 
-# Yes / No + conditional inputs
 youKnow = st.radio("Is the sender someone you know?", ("No", "Yes"), horizontal=True)
-youKnowDetails = ""
-if youKnow == "Yes":
-    youKnowDetails = st.text_input("Who is the sender?")
+youKnowDetails = st.text_input("Who is the sender?") if youKnow == "Yes" else ""
 
-claimedAcc = st.radio(
-    "Do you have an account with the claimed sender?",
-    ("No", "Yes"),
-    horizontal=True
-)
-claimedAccDetails = ""
-if claimedAcc == "Yes":
-    claimedAccDetails = st.text_input("Which company or service?")
+claimedAcc = st.radio("Do you have an account with the claimed sender?", ("No", "Yes"), horizontal=True)
+claimedAccDetails = st.text_input("Which company or service?") if claimedAcc == "Yes" else ""
 
-actionTaken = st.radio(
-    "Did you take any action because of this message?",
-    ("No", "Yes"),
-    horizontal=True
-)
-actionTakenDetails = ""
-if actionTaken == "Yes":
-    actionTakenDetails = st.text_input("What action did you take?")
+actionTaken = st.radio("Did you take any action because of this message?", ("No", "Yes"), horizontal=True)
+actionTakenDetails = st.text_input("What action did you take?") if actionTaken == "Yes" else ""
 
-previousCom = st.radio(
-    "Have you communicated with this sender before?",
-    ("No", "Yes"),
-    horizontal=True
-)
-previousComDetails = ""
-if previousCom == "Yes":
-    previousComDetails = st.text_input("Describe the prior communication")
+previousCom = st.radio("Have you communicated with this sender before?", ("No", "Yes"), horizontal=True)
+previousComDetails = st.text_input("Describe prior communication") if previousCom == "Yes" else ""
 
 deviceUsed = st.text_input("What device did you use?")
 region = st.text_input("Your region/country?")
 
-concernLevel = st.slider("How concerned are you (1–10)?", 1, 10, 5)
+concernLevel = st.slider("How concerned are you? (1–10)", 1, 10, 5)
 
 messageType = st.radio(
     "Type of message received:",
     ("Email", "SMS/Text Message", "Social Media", "Instant Message", "Other")
 )
 
-# --- Sidebar: URL Checker ---
+# ---------------- SIDEBAR: URL CHECK ----------------
 st.sidebar.header("Phishing URL Checker")
-phishingUrl = st.sidebar.text_input("Enter URL:")
+phishingUrl = st.sidebar.text_input("Enter a URL:")
 
 if st.sidebar.button("Check URL"):
-    with st.spinner("Analyzing URL..."):
-        prompt = f"""
-        You are an AI cybersecurity analyst.
-        Analyze the following URL for phishing risks:
+    if not phishingUrl.strip():
+        st.sidebar.error("Please enter a URL.")
+    else:
+        with st.spinner("Analyzing URL..."):
+            try:
+                url_prompt = f"""
+                You are an AI cybersecurity analyst.
 
-        URL: {phishingUrl}
+                Analyze the following URL for phishing risks:
+                {phishingUrl}
 
-        Provide:
-        - Risk level (Low/Medium/High)
-        - Why it may be dangerous
-        - Recommended next steps
-        """
-        urlAnalysis = model.generate_content(prompt)
-        st.sidebar.write(urlAnalysis.text)
+                Provide:
+                - Risk level (Low / Medium / High)
+                - Why it may be dangerous
+                - What the user should do next
+                """
+                url_result = model.generate_content(url_prompt)
+                st.sidebar.write(url_result.text)
+            except Exception:
+                st.sidebar.error("URL analysis failed. Try again.")
 
-# --- Analyze Message ---
+# ---------------- MESSAGE ANALYSIS ----------------
+st.divider()
+
 if st.button("Analyze Message"):
     if not content.strip():
-        st.warning("Please paste a message to analyze.")
+        st.error("Please paste a message to analyze.")
     else:
         with st.spinner("Analyzing message..."):
-            prompt = f"""
-            You are an AI cybersecurity analyst analyzing a potentially malicious message.
+            try:
+                prompt = f"""
+                You are an AI cybersecurity analyst analyzing a potentially malicious message.
 
-            Message content:
-            {content}
+                Message content:
+                {content}
 
-            Context:
-            - Message type: {messageType}
-            - How received: {howRecieved}
-            - Know sender: {youKnow} ({youKnowDetails})
-            - Claimed account: {claimedAcc} ({claimedAccDetails})
-            - Action taken: {actionTaken} ({actionTakenDetails})
-            - Previous communication: {previousCom} ({previousComDetails})
-            - Device used: {deviceUsed}
-            - Region: {region}
-            - User concern level: {concernLevel}/10
+                Context:
+                - Message type: {messageType}
+                - How received: {howRecieved}
+                - Know sender: {youKnow} ({youKnowDetails})
+                - Claimed account: {claimedAcc} ({claimedAccDetails})
+                - Action taken: {actionTaken} ({actionTakenDetails})
+                - Previous communication: {previousCom} ({previousComDetails})
+                - Device used: {deviceUsed}
+                - Region: {region}
+                - User concern level: {concernLevel}/10
 
-            Tasks:
-            1. Identify social engineering tactics.
-            2. Identify phishing indicators.
-            3. Give Social Engineering Risk (Low/Medium/High).
-            4. Give Phishing Risk (Low/Medium/High).
-            5. Highlight suspicious phrases or links.
-            6. Provide clear next steps.
-            """
+                Tasks:
+                1. Identify social engineering tactics.
+                2. Identify phishing indicators.
+                3. Give Social Engineering Risk (Low/Medium/High).
+                4. Give Phishing Risk (Low/Medium/High).
+                5. Highlight suspicious phrases or links.
+                6. Provide clear next steps.
+                """
 
-            result = model.generate_content(prompt)
-            st.subheader("Analysis Results")
-            st.write(result.text)
+                result = model.generate_content(prompt)
 
+                st.subheader("Analysis Results")
+                st.write(result.text)
 
+            except Exception:
+                st.error("Analysis failed. Please try again.")
 
+# ---------------- FOOTER ----------------
+st.caption("⚠️ This tool provides guidance only. Always verify messages independently.")
 
 
 

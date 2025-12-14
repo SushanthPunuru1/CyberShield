@@ -1,5 +1,6 @@
 import streamlit as st
 import google.generativeai as genai
+from datetime import datetime
 
 # ---------------- CONFIG ----------------
 API_KEY_VALUE = st.secrets["API_KEY"]
@@ -152,6 +153,7 @@ if st.session_state.history:
     for item in reversed(st.session_state.history):
         with st.expander(item["time"]):
             st.write(item["result"])
+
 
 
 

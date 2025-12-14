@@ -2,7 +2,7 @@ import streamlit as st
 import google.generativeai as genai
 
 
-genai.configure(api_key = "AIzaSyCTaWCjtw6BfPWeqSz0ZBd_QlcdRIH1VW4")
+genai.configure(api_key = "api_key")
 
 
 model = genai.GenerativeModel("gemini-2.5-flash")
@@ -121,6 +121,7 @@ if st.button("Analyze Message"):
             result = model.generate_content(prompt)
             st.subheader("Analysis Results")
             st.write(result.text)
+
 
 
 

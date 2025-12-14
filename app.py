@@ -1,7 +1,7 @@
 import streamlit as st
 import google.generativeai as genai
 
-
+api_key = st.secrets["api_key"]
 genai.configure(api_key = "api_key")
 
 
@@ -121,6 +121,7 @@ if st.button("Analyze Message"):
             result = model.generate_content(prompt)
             st.subheader("Analysis Results")
             st.write(result.text)
+
 
 
 

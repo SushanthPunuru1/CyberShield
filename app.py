@@ -14,7 +14,7 @@ if "history" not in st.session_state:
 # ---------------- UI ----------------
 st.set_page_config(page_title="CyberShield", layout="centered")
 
-st.title("🛡️ CyberShield")
+st.title("Social Engineering and Phishing Detector")
 st.write("Analyze messages for **social engineering and phishing risks**.")
 
 # ---------------- USER INPUT ----------------
@@ -153,6 +153,7 @@ if st.session_state.history:
     for item in reversed(st.session_state.history):
         with st.expander(item["time"]):
             st.write(item["result"])
+
 
 
 

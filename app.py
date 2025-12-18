@@ -115,8 +115,8 @@ if st.button("Analyze Message"):
     7. Provide clear next steps.
     """
 
-    with st.spinner("Analyzing..."):
-        result = model.generate_content(prompt)
+    
+    result = model.generate_content(prompt)
 
     analysis = result.text
     
@@ -133,6 +133,7 @@ if st.button("Analyze Message"):
         st.success("✅ Low risk detected.")
 
     st.markdown(analysis)
+
 
 
 

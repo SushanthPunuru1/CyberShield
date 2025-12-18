@@ -119,9 +119,6 @@ if st.button("Analyze Message"):
         result = model.generate_content(prompt)
 
     analysis = result.text
-    st.session_state.history.append({
-        "time": datetime.now().strftime("%Y-%m-%d %H:%M"),
-        "result": analysis
     })
 
     # ---------------- RESULTS ----------------
@@ -137,22 +134,7 @@ if st.button("Analyze Message"):
 
     st.markdown(analysis)
 
-    # ---------------- DOWNLOAD REPORT ----------------
-    st.download_button(
-        "📄 Download Report",
-        data=analysis,
-        file_name="cybershield_report.txt",
-        mime="text/plain"
-    )
 
-# ---------------- HISTORY ----------------
-if st.session_state.history:
-    st.divider()
-    st.header("🕘 Scan History")
-
-    for item in reversed(st.session_state.history):
-        with st.expander(item["time"]):
-            st.write(item["result"])
 
 
 

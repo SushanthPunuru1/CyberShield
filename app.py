@@ -119,7 +119,7 @@ if st.button("Analyze Message"):
         result = model.generate_content(prompt)
 
     analysis = result.text
-    })
+    
 
     # ---------------- RESULTS ----------------
     st.divider()
@@ -133,6 +133,7 @@ if st.button("Analyze Message"):
         st.success("✅ Low risk detected.")
 
     st.markdown(analysis)
+
 
 
 

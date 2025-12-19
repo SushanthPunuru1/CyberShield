@@ -83,8 +83,15 @@ if st.sidebar.button("Check URL"):
     - Why it is risky or safe
     - Recommended action
     """
+    if "High" in analysis:
+        st.error("⚠️ High risk detected — this message is likely dangerous.")
+    elif "Medium" in analysis:
+        st.warning("⚠️ Medium risk — proceed with caution.")
+    else:
+        st.success("✅ Low risk detected.")
     url_result = model.generate_content(url_prompt)
-    st.sidebar.write(url_result.text)
+    url_analysis = url_result.text
+    st.sidebar.write(url_analysis.text)
 
 # ---------------- ANALYZE MESSAGE ----------------
 if st.button("Analyze Message"):
@@ -133,6 +140,7 @@ if st.button("Analyze Message"):
         st.success("✅ Low risk detected.")
 
     st.markdown(analysis)
+
 
 
 

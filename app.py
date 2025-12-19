@@ -132,14 +132,10 @@ if st.button("Analyze Message"):
     st.divider()
     st.header("📊 Analysis Results")
 
-    if "High" in analysis:
-        st.error("⚠️ High risk detected — this message is likely dangerous.")
-    elif "Medium" in analysis:
-        st.warning("⚠️ Medium risk — proceed with caution.")
-    else:
-        st.success("✅ Low risk detected.")
+    
 
     st.markdown(analysis)
+
 
 
 
